@@ -13,20 +13,20 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DemoWebApplication 
 {
 
-	public static IMqttClient publisher;
-	public static String publisherId;
+	public static IMqttClient subscriber;
+	public static String subscriberId;
 	
 	public static void main(String[] args) 
 	{
-		publisherId = UUID.randomUUID().toString();
+		subscriberId = UUID.randomUUID().toString();
 		try 
 		{
-			publisher = new MqttClient("tcp://52.91.152.101",publisherId);
+			subscriber = new MqttClient("tcp://52.91.152.101", subscriberId);
 			MqttConnectOptions options = new MqttConnectOptions();
 			options.setAutomaticReconnect(true);
 			options.setCleanSession(true);
 			options.setConnectionTimeout(10);
-			publisher.connect(options);
+			subscriber.connect(options);
 		} 
 		catch (MqttException e) 
 		{

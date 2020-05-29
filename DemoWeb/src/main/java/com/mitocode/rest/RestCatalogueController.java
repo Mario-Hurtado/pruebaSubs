@@ -2,7 +2,7 @@ package com.mitocode.rest;
 
 import java.util.List;
 import java.util.UUID;
-
+import com.mitocode.model.*;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.mitocode.repo.*;
 import com.mitocode.DemoWebApplication;
 import com.mitocode.model.ProductoChiper;
 import com.mitocode.repo.IProductoChiperRepo;
@@ -24,20 +24,19 @@ import com.mitocode.repo.IProductoChiperRepo;
 public class RestCatalogueController 
 {
 	@Autowired
-	private IProductoChiperRepo repo;
+	private IVentaRepo repo;
 
-	private MessageBrokerPublisher messageBroker = new MessageBrokerPublisher(DemoWebApplication.publisher);
+	private MessageBrokerSubscriber messageBroker = new MessageBrokerSubscriber(DemoWebApplication.subscriber);
 
 	@GetMapping
-	public List<ProductoChiper> listar(){
+	public List<Venta> listar(){
 		return repo.findAll();
 	}
 
 	@PostMapping
-	public void insertar(@RequestBody ProductoChiper prod){
-		repo.save(prod);
-		messageBroker.textoEnviar = "POST/" + prod.getId() + "/" + prod.getNombre() + "/" + prod.getCategoria() + "/" +
-				prod.getDescripcion() + "/" + prod.getPrecio();
+	public void insertar(@RequestBody Venta venta){
+		repo.save(venta);
+		//messageBroker.textoRecibir;
 		try 
 		{
 			messageBroker.call();
@@ -50,9 +49,8 @@ public class RestCatalogueController
 
 	@PutMapping
 	public void modificar(@RequestBody ProductoChiper prod){
-		repo.save(prod);
-		messageBroker.textoEnviar = "UPDATE/" +  prod.getId() + "/" + prod.getNombre() + "/" + prod.getCategoria() + "/" +
-				prod.getDescripcion() + "/" + prod.getPrecio();
+		//repo.save(prod);
+		
 		try 
 		{
 			messageBroker.call();
@@ -66,7 +64,7 @@ public class RestCatalogueController
 	@DeleteMapping(value = "/{id}")
 	public void eliminar(@PathVariable("id") String id) {
 		repo.deleteById(id);
-		messageBroker.textoEnviar = "DELETE/" + id;
+		messageBroker.textoRecibir = "DELETE/" + id;
 		try 
 		{
 			messageBroker.call();
